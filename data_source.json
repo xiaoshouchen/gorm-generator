@@ -1,0 +1,23 @@
+{
+  "databases": [
+    {
+      "scheme": "china_travel",
+      "package_name": "model",
+      "connect": {
+        "type": "mysql",
+        "host": "qq.dofor.site",
+        "port": "3306",
+        "user": "root",
+        "password": "Jdf*&3s#@dD23f"
+      },
+      "table_filter_option": "all",
+      "tables": [],
+      "cache_expiration": [
+        {
+          "name": "users",
+          "time": 3600
+        }
+      ]
+    }
+  ]
+}
