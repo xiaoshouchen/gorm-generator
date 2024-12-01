@@ -10,4 +10,20 @@
         return {{$varName}}Arr,res.Error
         }
     {{end}}
+
+    func (r *{{$modelName}}Repo) FindList(where []Where, page, size int64, orderBy string) ([]{{$modelName}},error) {
+        var results []{{$modelName}}
+        db := r.db
+        for _, w := range where {
+            db = db.Model(&{{$modelName}}{}).Where(w.Key+" "+w.Value.Op+" ?", w.Value.Arg)
+        }
+        if orderBy != "" {
+            db = db.Order(orderBy)
+        }
+        if page > 0 && size > 0 {
+            db = db.Limit(int(size)).Offset(int((page - 1) * size))
+        }
+        res := db.Find(&results)
+        return results, res.Error
+    }
 {{end}}
