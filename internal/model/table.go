@@ -1,7 +1,7 @@
 package model
 
 import (
-	"gorm-generator/pkg"
+	"github.com/xiaoshouchen/gorm-generator/pkg"
 )
 
 type Table struct {

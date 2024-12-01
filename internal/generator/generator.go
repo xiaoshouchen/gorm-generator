@@ -1,7 +1,7 @@
 package generator
 
 import (
-	"gorm-generator/internal/model"
+	"github.com/xiaoshouchen/gorm-generator/internal/model"
 )
 
 type Generator interface {

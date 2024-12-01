@@ -1,6 +1,6 @@
 package model
 
-import "gorm-generator/pkg"
+import "github.com/xiaoshouchen/gorm-generator/pkg"
 
 type Config struct {
 	Scheme      string `json:"scheme"`

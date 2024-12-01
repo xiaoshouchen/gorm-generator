@@ -2,7 +2,7 @@ package connector
 
 import (
 	"fmt"
-	"gorm-generator/internal/model"
+	"github.com/xiaoshouchen/gorm-generator/internal/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"

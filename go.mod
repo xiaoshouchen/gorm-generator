@@ -1,4 +1,4 @@
-module gorm-generator
+module github.com/xiaoshouchen/gorm-generator
 
 go 1.20
 

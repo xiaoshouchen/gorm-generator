@@ -2,9 +2,9 @@ package func_map
 
 import (
 	"github.com/gertd/go-pluralize"
-	"gorm-generator/internal/model"
-	"gorm-generator/internal/parser"
-	"gorm-generator/pkg"
+	"github.com/xiaoshouchen/gorm-generator/internal/model"
+	"github.com/xiaoshouchen/gorm-generator/internal/parser"
+	"github.com/xiaoshouchen/gorm-generator/pkg"
 	"html/template"
 	"strings"
 )

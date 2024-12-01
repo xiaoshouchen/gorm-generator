@@ -1,7 +1,7 @@
 package parser
 
 import (
-	"gorm-generator/internal/model"
+	"github.com/xiaoshouchen/gorm-generator/internal/model"
 	"gorm.io/gorm"
 	"strings"
 )
