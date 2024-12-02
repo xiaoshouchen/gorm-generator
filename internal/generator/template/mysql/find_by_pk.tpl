@@ -13,7 +13,7 @@
     {{ $modelName := .TableName | singular | upCamel }}
     {{ $varName := .TableName | singular | lowCamel }}
     // FindBy{{pkFuncName}}Arr 根据主键获取数据
-    func (r *{{$modelName}}Repo) FindBy{{pkFuncName}}Arr({{pksParams}}Arr []{{pksType}}) []{{$modelName}} {
+    func (r *{{$modelName}}Repo) FindBy{{pkFuncName}}Arr(ctx context.Context,{{pksParams}}Arr []{{pksType}}) []{{$modelName}} {
     var {{$varName}}Arr = make([]{{$modelName}}, 0)
     r.db.WithContext(ctx).Where("{{pksWhereCondition}}", {{pksParams}}Arr).Find(&{{$varName}}Arr)
     return {{$varName}}Arr
