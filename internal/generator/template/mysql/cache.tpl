@@ -1,5 +1,5 @@
 {{define "cache"}}
-    func (r *UserRepo) findBySlug(slug string) User {
+    func (r *UserRepo) findBySlug(ctx context.Context, slug string) User {
     var pk string
     var user User
     err := cache.GetOnce().Get(SlugCacheKey).String(&pk)
@@ -9,13 +9,13 @@
     return user
     }
     }
-    r.db.Where("slug = ?", slug).First(&user)
+    r.db.WithContext(ctx).Where("slug = ?", slug).First(&user)
 
     cache.GetOnce().Set(fmt.Sprintf(SlugCacheKey, formatInterface()), formatInterface(user.Id), 86400)
     cache.GetOnce().Set(fmt.Sprintf(SlugCacheKey, formatInterface(user.Id)), user, 86400)
     return user
     }
-    func (r *UserRepo) findBySlugArr(slugArr []string) []User {
+    func (r *UserRepo) findBySlugArr(ctx context.Context, slugArr []string) []User {
     var keys []string
     for _, v := range slugArr {
     keys = append(keys, fmt.Sprintf(UserCacheKey, formatInterface(v)))
@@ -46,7 +46,7 @@
     return user
     }
     }
-    r.db.Where("slug = ?", slug).First(&user)
+    r.db.WithContext(ctx).Where("slug = ?", slug).First(&user)
 
     cache.GetOnce().Set(fmt.Sprintf(SlugCacheKey, formatInterface(user.Slug)), formatInterface(user.Id), 86400)
     cache.GetOnce().Set(fmt.Sprintf(SlugCacheKey, formatInterface(user.Id)), user, 86400)

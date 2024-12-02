@@ -1,8 +1,8 @@
 {{define "insert"}}
 {{ $modelName := .TableName | singular | upCamel }}
 // BatchUpsert 批量插入或更新
-func (r *{{$modelName}}Repo) BatchUpsert(insertSlice ...*{{$modelName}})(int64, error) {
-	db := r.db
+func (r *{{$modelName}}Repo) BatchUpsert(ctx context.Context,insertSlice ...*{{$modelName}})(int64, error) {
+	db := r.db.WithContext(ctx)
 
 		db = db.Clauses(
 			clause.OnConflict{
@@ -32,8 +32,8 @@ db = db.Create(insertSlice)
 return db.RowsAffected, db.Error
 }
 
-func (r *{{$modelName}}Repo) BatchInsert(insertSlice ...*{{$modelName}})(int64, error) {
-db := r.db
+func (r *{{$modelName}}Repo) BatchInsert(ctx context.Context,insertSlice ...*{{$modelName}})(int64, error) {
+db := r.db.WithContext(ctx)
 if len(insertSlice) > 1000 {
 db = db.CreateInBatches(insertSlice, 1000)
 
@@ -45,8 +45,8 @@ return db.RowsAffected, db.Error
 
 // Insert 插入单个
 // return id
-func (r *{{$modelName}}Repo) Insert(insert *{{$modelName}})error {
-db := r.db
+func (r *{{$modelName}}Repo) Insert(ctx context.Context,insert *{{$modelName}})error {
+db := r.db.WithContext(ctx)
 db = db.Create(insert)
 return db.Error
 }

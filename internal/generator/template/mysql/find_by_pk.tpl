@@ -2,9 +2,9 @@
     {{ $modelName := .TableName | singular | upCamel }}
     {{ $varName := .TableName | singular | lowCamel }}
     // FindBy{{pkFuncName}} 根据主键进行查询
-    func (r *{{$modelName}}Repo) FindBy{{pkFuncName}}({{pkParams}}) ({{$modelName}},error) {
+    func (r *{{$modelName}}Repo) FindBy{{pkFuncName}}(ctx context.Context,{{pkParams}}) ({{$modelName}},error) {
     var {{$varName}} {{$modelName}}
-    res:= r.db.Where("{{pkWhereCondition}}", {{pkWhereArgs}}).First(&{{$varName}})
+    res:= r.db.WithContext(ctx).Where("{{pkWhereCondition}}", {{pkWhereArgs}}).First(&{{$varName}})
     return {{$varName}},res.Error
     }
 {{end}}
@@ -15,7 +15,7 @@
     // FindBy{{pkFuncName}}Arr 根据主键获取数据
     func (r *{{$modelName}}Repo) FindBy{{pkFuncName}}Arr({{pksParams}}Arr []{{pksType}}) []{{$modelName}} {
     var {{$varName}}Arr = make([]{{$modelName}}, 0)
-    r.db.Where("{{pksWhereCondition}}", {{pksParams}}Arr).Find(&{{$varName}}Arr)
+    r.db.WithContext(ctx).Where("{{pksWhereCondition}}", {{pksParams}}Arr).Find(&{{$varName}}Arr)
     return {{$varName}}Arr
     }
 {{end}}
@@ -24,11 +24,11 @@
     {{ $modelName := .TableName | singular | upCamel }}
     {{ $varName := .TableName | singular | lowCamel }}
     // FindBy{{pkFuncName}} 根据主键进行查询
-    func (r *{{$modelName}}Repo) FindBy{{pkFuncName}}({{pkParams}}) ({{$modelName}},error) {
+    func (r *{{$modelName}}Repo) FindBy{{pkFuncName}}(ctx context.Context,{{pkParams}}) ({{$modelName}},error) {
     var {{$varName}} {{$modelName}}
     var key = fmt.Sprintf("{{.TableName}}_pk_%s", formatInterface([]interface{}{ {{pkWhereArgs}} }))
     if err := cache.GetOnce().Get(key).Json(&{{$varName}}); err != nil {
-    res :=r.db.Where("{{pkWhereCondition}}", {{pkWhereArgs}}).First(&{{$varName}})
+    res :=r.db.WithContext(ctx).Where("{{pkWhereCondition}}", {{pkWhereArgs}}).First(&{{$varName}})
     if res.Error != nil {
     return {{$varName}},res.Error
     }
@@ -44,7 +44,7 @@
     {{ $modelName := .TableName | singular | upCamel }}
     {{ $varName := .TableName | singular | lowCamel }}
     // FindBy{{pkFuncName}}Arr 根据主键获取数据
-    func (r *{{$modelName}}Repo) FindBy{{pkFuncName}}Arr({{pksParams}}Arr []{{pksType}}) []{{$modelName}} {
+    func (r *{{$modelName}}Repo) FindBy{{pkFuncName}}Arr(ctx context.Context,{{pksParams}}Arr []{{pksType}}) []{{$modelName}} {
     var {{$varName}}Arr = make([]{{$modelName}}, 0)
     var cacheKeyList []string
     var cacheKeyMap = make(map[string]bool)
@@ -74,7 +74,7 @@
     return {{$varName}}Arr
     }
 
-    r.db.Where("{{pksWhereCondition}}", {{pksParams}}Arr).Find(&{{$varName}}Arr)
+    r.db.WithContext(ctx).Where("{{pksWhereCondition}}", {{pksParams}}Arr).Find(&{{$varName}}Arr)
     cacheMap := make(map[string]interface{})
     for _, item := range {{$varName}}Arr {
     cacheKey := fmt.Sprintf({{$modelName}}CacheKey, formatInterface([]interface{} { {{pksFields}} }))
