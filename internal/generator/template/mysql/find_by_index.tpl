@@ -13,9 +13,9 @@
 
     func (r *{{$modelName}}Repo) FindList(where []Where, page, size int64, orderBy string) ([]{{$modelName}},error) {
         var results []{{$modelName}}
-        db := r.db
+        db := r.db.Model(&{{$modelName}}{})
         for _, w := range where {
-            db = db.Model(&{{$modelName}}{}).Where(w.Key+" "+w.Value.Op+" ?", w.Value.Arg)
+            db = db.Where(w.Key+" "+w.Value.Op+" ?", w.Value.Arg)
         }
         if orderBy != "" {
             db = db.Order(orderBy)

@@ -26,3 +26,4 @@ return "{{.TableName}}"
 {{template "insert" .}}
 {{template "omit" .}}
 {{template "find" .}}
+{{template "count" .}}

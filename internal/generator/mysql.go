@@ -38,9 +38,12 @@ var mysqlFindByPk string
 //go:embed template/mysql/find_by_unique.tpl
 var mysqlFindByUnique string
 
+//go:embed template/mysql/count.tpl
+var mysqlCount string
+
 func (m *Mysql) DbTpl() string {
 	return mysqlModel + mysqlField + mysqlInsert + mysqlOmit +
-		mysqlFind + mysqlFindByPk + mysqlFindByUnique + mysqlFindByIndex
+		mysqlFind + mysqlFindByPk + mysqlFindByUnique + mysqlFindByIndex + mysqlCount
 }
 
 func (m *Mysql) RepoTpl() string {
