@@ -41,9 +41,12 @@ var mysqlFindByUnique string
 //go:embed template/mysql/count.tpl
 var mysqlCount string
 
+//go:embed template/mysql/delete.tpl
+var mysqlDelete string
+
 func (m *Mysql) DbTpl() string {
 	return mysqlModel + mysqlField + mysqlInsert + mysqlOmit +
-		mysqlFind + mysqlFindByPk + mysqlFindByUnique + mysqlFindByIndex + mysqlCount
+		mysqlFind + mysqlFindByPk + mysqlFindByUnique + mysqlFindByIndex + mysqlCount + mysqlDelete
 }
 
 func (m *Mysql) RepoTpl() string {

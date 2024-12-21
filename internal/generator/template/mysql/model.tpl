@@ -8,6 +8,7 @@ import (
 {{end}}
 {{if hasTime}}"time"{{end}}
 
+"gorm.io/gorm"
 "gorm.io/gorm/clause"
 {{if eq softDelete 1}}"gorm.io/plugin/soft_delete"{{end}}
 )
@@ -23,7 +24,12 @@ func ({{$modelName}}) TableName() string {
 return "{{.TableName}}"
 }
 
+func (r *{{$modelName}}Repo) DB() *gorm.DB {
+return r.db
+}
+
 {{template "insert" .}}
 {{template "omit" .}}
 {{template "find" .}}
 {{template "count" .}}
+{{template "delete" .}}

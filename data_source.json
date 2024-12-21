@@ -1,14 +1,14 @@
 {
   "databases": [
     {
-      "scheme": "china_travel",
+      "scheme": "panda-trip",
       "package_name": "model",
       "connect": {
         "type": "mysql",
-        "host": "qq.dofor.site",
-        "port": "3306",
+        "host": "localhost",
+        "port": "3308",
         "user": "root",
-        "password": "Jdf*&3s#@dD23f"
+        "password": "xxhhyydds123!@#"
       },
       "table_filter_option": "all",
       "tables": [],
