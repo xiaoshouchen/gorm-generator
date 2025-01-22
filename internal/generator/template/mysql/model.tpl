@@ -18,7 +18,7 @@ type {{$modelName}} struct {
 {{range $k,$v := .Columns}}{{template "field" $v}}{{end}}
 }
 
-const {{$modelName}}CacheKey="{{.TableName}}_pk_%s"
+const {{$modelName}}CacheKey="{{.TableName}}_%s"
 
 func ({{$modelName}}) TableName() string {
 return "{{.TableName}}"

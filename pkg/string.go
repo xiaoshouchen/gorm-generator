@@ -3,6 +3,7 @@ package pkg
 import (
 	"regexp"
 	"strings"
+	"unicode"
 )
 
 func LineToLowCamel(str string) string {
@@ -35,4 +36,26 @@ func Inline(str string) string {
 func ContainsNumber(s string) bool {
 	pattern := regexp.MustCompile(`\d`)
 	return pattern.MatchString(s)
+}
+
+func CamelToSnake(s string) string {
+	if s == "" {
+		return s
+	}
+
+	var result strings.Builder
+	result.Grow(len(s) * 2)
+
+	for i, r := range s {
+		if unicode.IsUpper(r) {
+			if i > 0 {
+				result.WriteByte('_')
+			}
+			result.WriteRune(unicode.ToLower(r))
+		} else {
+			result.WriteRune(r)
+		}
+	}
+
+	return result.String()
 }

@@ -46,9 +46,33 @@ func (u *Unique) WhereCondition(cols []model.Column) string {
 func (u *Unique) WhereArgs(cols []model.Column) string {
 	var tempArr []string
 	for _, col := range cols {
-		tempArr = append(tempArr, pkg.LineToLowCamel(col.ColumnName))
+		if strings.HasPrefix(u.pa.TranslateDataType(col), "*") {
+			tempArr = append(tempArr, "*"+pkg.LineToLowCamel(col.ColumnName))
+		} else {
+			tempArr = append(tempArr, pkg.LineToLowCamel(col.ColumnName))
+		}
 	}
 	return strings.Join(tempArr, ",")
+}
+
+func (u *Unique) CacheKeyFmtArgs(cols []model.Column) string {
+	var tempArr []string
+	for _, col := range cols {
+		if strings.HasPrefix(u.pa.TranslateDataType(col), "*") {
+			tempArr = append(tempArr, "*"+pkg.LineToLowCamel(col.ColumnName))
+		} else {
+			tempArr = append(tempArr, pkg.LineToLowCamel(col.ColumnName))
+		}
+	}
+	return strings.Join(tempArr, "_")
+}
+
+func (u *Unique) CacheKeyFmtValues(cols []model.Column) string {
+	var arr []string
+	for range cols {
+		arr = append(arr, "%v")
+	}
+	return strings.Join(arr, "_")
 }
 
 func (u *Unique) UniquesType(cols []model.Column) string {

@@ -4,7 +4,7 @@
     // FindBy{{pkFuncName}} 根据主键进行查询
     func (r *{{$modelName}}Repo) FindBy{{pkFuncName}}({{pkParams}}) ({{$modelName}},error) {
     var {{$varName}} {{$modelName}}
-    res:= r.db.Where("{{pkWhereCondition}}", {{pkWhereArgs}}).First(&{{$varName}})
+    res:= r.db.Where("{{pkWhereCondition}}", {{pkWhereArgsStr}}).First(&{{$varName}})
     return {{$varName}},res.Error
     }
 {{end}}
@@ -26,9 +26,9 @@
     // FindBy{{pkFuncName}} 根据主键进行查询
     func (r *{{$modelName}}Repo) FindBy{{pkFuncName}}({{pkParams}}) ({{$modelName}},error) {
     var {{$varName}} {{$modelName}}
-    var key = fmt.Sprintf("{{.TableName}}_pk_%s", formatInterface([]interface{}{ {{pkWhereArgs}} }))
+    var key = fmt.Sprintf({{$modelName}}CacheKey, formatInterface([]interface{}{ {{pkWhereArgsStr}} }))
     if err := cache.GetOnce().Get(key).Json(&{{$varName}}); err != nil {
-    res :=r.db.Where("{{pkWhereCondition}}", {{pkWhereArgs}}).First(&{{$varName}})
+    res :=r.db.Where("{{pkWhereCondition}}", {{pkWhereArgsStr}}).First(&{{$varName}})
     if res.Error != nil {
     return {{$varName}},res.Error
     }
@@ -61,7 +61,7 @@
     continue
     } else {
     {{$varName}}Arr = append({{$varName}}Arr, item)
-    cacheKeyMap[formatInterface([]interface{} { {{pksFields}} })] = true
+    cacheKeyMap[fmt.Sprintf({{$modelName}}CacheKey, formatInterface([]interface{} { {{"item"|pksFields}} }))] = true
     }
     }
     }
@@ -77,7 +77,7 @@
     r.db.Where("{{pksWhereCondition}}", {{pksParams}}Arr).Find(&{{$varName}}Arr)
     cacheMap := make(map[string]interface{})
     for _, item := range {{$varName}}Arr {
-    cacheKey := fmt.Sprintf({{$modelName}}CacheKey, formatInterface([]interface{} { {{pksFields}} }))
+    cacheKey := fmt.Sprintf({{$modelName}}CacheKey, formatInterface([]interface{} { {{"item"|pksFields}} }))
     cacheMap[cacheKey] = item
     }
     _ = cache.GetOnce().MultiSet(cacheMap,{{cacheTtl}})

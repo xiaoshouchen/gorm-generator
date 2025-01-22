@@ -28,6 +28,14 @@ func (p *Pk) FuncName() string {
 	return strings.Join(colNames, "And")
 }
 
+func (p *Pk) CacheKeyFmt() string {
+	var arr []string
+	for range p.table.GetPks() {
+		arr = append(arr, "%v")
+	}
+	return strings.Join(arr, "_")
+}
+
 // Params findByPk params ,
 // example: id int64
 // example: key1 string , key2 string
@@ -53,7 +61,16 @@ func (p *Pk) WhereCondition() string {
 
 // WhereArgs findByPk where args
 // example: id , key1 , key2
-func (p *Pk) WhereArgs() string {
+func (p *Pk) WhereArgs() []interface{} {
+	pks := p.table.GetPks()
+	var tempArr []interface{}
+	for _, pk := range pks {
+		tempArr = append(tempArr, pkg.LineToLowCamel(pk.ColumnName))
+	}
+	return tempArr
+}
+
+func (p *Pk) WhereArgsStr() string {
 	pks := p.table.GetPks()
 	var tempArr []string
 	for _, pk := range pks {
@@ -99,11 +116,11 @@ func (p *Pk) PksType() string {
 	return "interface{}"
 }
 
-func (p *Pk) PksFields() string {
+func (p *Pk) PksFields(prefix string) string {
 	pks := p.table.GetPks()
 	var tempArr []string
 	for _, pk := range pks {
-		tempArr = append(tempArr, "item."+pkg.LineToUpCamel(pk.ColumnName))
+		tempArr = append(tempArr, prefix+"."+pkg.LineToUpCamel(pk.ColumnName))
 	}
 	return strings.Join(tempArr, ",")
 }

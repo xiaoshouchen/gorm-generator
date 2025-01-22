@@ -20,6 +20,7 @@ func GetFuncMap(config model.Config, table model.Table, pa parser.Parser) templa
 		"containsNumber": pkg.ContainsNumber,
 		"joins":          pkg.ArrayJoins,
 		"paramJoins":     pkg.ArrayParamJoins,
+		"snake":          pkg.CamelToSnake,
 	}
 	fm["transType"] = pa.TranslateDataType
 	fm["hasTime"] = table.HasTime
@@ -31,8 +32,10 @@ func GetFuncMap(config model.Config, table model.Table, pa parser.Parser) templa
 	// pk func
 	pk := NewPk(table, pa)
 	fm["pkFuncName"] = pk.FuncName
+	fm["pkCacheKeyFmt"] = pk.CacheKeyFmt
 	fm["pkParams"] = pk.Params
 	fm["pkWhereCondition"] = pk.WhereCondition
+	fm["pkWhereArgsStr"] = pk.WhereArgsStr
 	fm["pkWhereArgs"] = pk.WhereArgs
 
 	// pks func

@@ -57,6 +57,7 @@ func generateAndWrite(tpl, path string, f template.FuncMap, table model.Table, o
 		log.Fatal(table.TableName, err)
 	}
 	source, err := format.Source(buf.Bytes())
+	//source := buf.Bytes()
 	if err != nil {
 		log.Fatal(table.TableName, err)
 	}
