@@ -22,7 +22,7 @@
         func (r *{{$modelName}}Repo) FindBy{{$funcName}}({{uniqueParams $v}}) ({{$modelName}},error) {
            var {{$varName}} {{$modelName}}
            // Try to get id from unique field cache
-           uniqueKey := fmt.Sprintf("{{$tableName}}_{{$funcName | snake}}_pk_%s", {{uniqueWhereArgs $v}})
+           uniqueKey := fmt.Sprintf("{{$tableName}}_{{$funcName | snake}}_pk_{{uniqueCountParams $v}}", {{uniqueWhereArgs $v}})
            var pk string
            if err := cache.GetOnce().Get(uniqueKey).String(&pk); err == nil {
               if err := cache.GetOnce().Get(pk).Json(&{{$varName}}); err == nil {

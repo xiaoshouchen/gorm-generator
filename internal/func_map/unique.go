@@ -1,10 +1,11 @@
 package func_map
 
 import (
+	"strings"
+
 	"github.com/xiaoshouchen/gorm-generator/internal/model"
 	"github.com/xiaoshouchen/gorm-generator/internal/parser"
 	"github.com/xiaoshouchen/gorm-generator/pkg"
-	"strings"
 )
 
 type Unique struct {
@@ -33,6 +34,14 @@ func (u *Unique) Params(cols []model.Column) string {
 		tempArr = append(tempArr, pkg.LineToLowCamel(col.ColumnName)+" "+u.pa.TranslateDataType(col))
 	}
 	return strings.Join(tempArr, ",")
+}
+
+func (u *Unique) CountParams(cols []model.Column) string {
+	var tempArr []string
+	for range cols {
+		tempArr = append(tempArr, "%v")
+	}
+	return strings.Join(tempArr, "_")
 }
 
 func (u *Unique) WhereCondition(cols []model.Column) string {

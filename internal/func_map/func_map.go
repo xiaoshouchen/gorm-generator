@@ -1,12 +1,13 @@
 package func_map
 
 import (
+	"html/template"
+	"strings"
+
 	"github.com/gertd/go-pluralize"
 	"github.com/xiaoshouchen/gorm-generator/internal/model"
 	"github.com/xiaoshouchen/gorm-generator/internal/parser"
 	"github.com/xiaoshouchen/gorm-generator/pkg"
-	"html/template"
-	"strings"
 )
 
 func GetFuncMap(config model.Config, table model.Table, pa parser.Parser) template.FuncMap {
@@ -50,6 +51,7 @@ func GetFuncMap(config model.Config, table model.Table, pa parser.Parser) templa
 	fm["uniques"] = table.GetUniques
 	fm["uniqueFuncName"] = uni.FuncName
 	fm["uniqueParams"] = uni.Params
+	fm["uniqueCountParams"] = uni.CountParams
 	fm["uniqueWhereCondition"] = uni.WhereCondition
 	fm["uniqueWhereArgs"] = uni.WhereArgs
 	fm["uniquesType"] = uni.UniquesType
