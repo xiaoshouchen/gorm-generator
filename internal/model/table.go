@@ -1,6 +1,8 @@
 package model
 
 import (
+	"sort"
+
 	"github.com/xiaoshouchen/gorm-generator/pkg"
 )
 
@@ -52,6 +54,12 @@ func (t *Table) GetUniques() map[string][]Column {
 			uniques[name] = append(uniques[name], t.getColumnByName(index.ColumnName))
 		}
 	}
+	// []Column 按照name排序
+	for _, v := range uniques {
+		sort.Slice(v, func(i, j int) bool {
+			return v[i].ColumnName < v[j].ColumnName
+		})
+	}
 	return uniques
 }
 
@@ -62,6 +70,12 @@ func (t *Table) GetIndexes() map[string][]Column {
 			name := index.IndexName
 			indexes[name] = append(indexes[name], t.getColumnByName(index.ColumnName))
 		}
+	}
+	// []Column 按照name排序
+	for _, v := range indexes {
+		sort.Slice(v, func(i, j int) bool {
+			return v[i].ColumnName < v[j].ColumnName
+		})
 	}
 	return indexes
 }

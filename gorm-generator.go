@@ -5,6 +5,11 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"go/format"
+	"html/template"
+	"log"
+	"os"
+
 	"github.com/gertd/go-pluralize"
 	"github.com/xiaoshouchen/gorm-generator/internal/connector"
 	"github.com/xiaoshouchen/gorm-generator/internal/func_map"
@@ -12,10 +17,6 @@ import (
 	"github.com/xiaoshouchen/gorm-generator/internal/model"
 	"github.com/xiaoshouchen/gorm-generator/internal/parser"
 	"github.com/xiaoshouchen/gorm-generator/pkg"
-	"go/format"
-	"html/template"
-	"log"
-	"os"
 )
 
 var dataSource = flag.String("f", "data_source.json", "文件地址")
@@ -87,6 +88,9 @@ func getConfig(j *[]model.Config) {
 	}
 	var configMap = make(map[string][]model.Config)
 	err = json.Unmarshal(tables, &configMap)
+	if err != nil {
+		log.Fatal(err)
+	}
 	if configs, ok := configMap["databases"]; ok {
 		*j = configs
 	}

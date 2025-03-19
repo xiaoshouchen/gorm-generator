@@ -6,7 +6,11 @@
         // FindBy{{$funcName}} 根据{{$funcName}}进行查询
         func (r *{{$modelName}}Repo) FindBy{{$funcName}}({{indexParams $v}},limit int,orderBy string) ([]{{$modelName}},error) {
         var {{$varName}}Arr []{{$modelName}}
-        res:= r.db.Where("{{indexWhereCondition $v}}", {{indexWhereArgs $v}}).Limit(limit).Order(orderBy).Find(&{{$varName}}Arr)
+        tempDb := r.db.Where("{{indexWhereCondition $v}}", {{indexWhereArgs $v}})
+        if limit > 0 {
+            tempDb = tempDb.Limit(limit)
+        }
+        res:= tempDb.Order(orderBy).Find(&{{$varName}}Arr)
         return {{$varName}}Arr,res.Error
         }
     {{end}}
