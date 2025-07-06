@@ -5,8 +5,11 @@ import (
 )
 
 type Generator interface {
-	DbTpl() string   // 获取数据库模板
-	RepoTpl() string // 获取仓库模板
+	DbTpl() string          // 获取数据库模板
+	RepoTpl() string        // 获取仓库模板
+	CacheTpl() string       // 获取缓存模板
+	CanalTpl() string       // 获取 Canal 模板
+	CanalRouterTpl() string // 获取 Canal Router 模板
 }
 
 func NewGenerator(config model.Config) Generator {

@@ -44,6 +44,15 @@ var mysqlCount string
 //go:embed template/mysql/delete.tpl
 var mysqlDelete string
 
+//go:embed template/mysql/cache.tpl
+var mysqlCache string
+
+//go:embed template/mysql/canal.tpl
+var mysqlCanal string
+
+//go:embed template/mysql/canal_router.tpl
+var mysqlCanalRouter string
+
 func (m *Mysql) DbTpl() string {
 	return mysqlModel + mysqlField + mysqlInsert + mysqlOmit +
 		mysqlFind + mysqlFindByPk + mysqlFindByUnique + mysqlFindByIndex + mysqlCount + mysqlDelete
@@ -51,4 +60,16 @@ func (m *Mysql) DbTpl() string {
 
 func (m *Mysql) RepoTpl() string {
 	return mysqlRepo
+}
+
+func (m *Mysql) CacheTpl() string {
+	return mysqlCache
+}
+
+func (m *Mysql) CanalTpl() string {
+	return mysqlCanal
+}
+
+func (m *Mysql) CanalRouterTpl() string {
+	return mysqlCanalRouter
 }

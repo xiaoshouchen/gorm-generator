@@ -9,6 +9,8 @@ import (
 	"html/template"
 	"log"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/gertd/go-pluralize"
 	"github.com/xiaoshouchen/gorm-generator/internal/connector"
@@ -20,13 +22,26 @@ import (
 )
 
 var dataSource = flag.String("f", "data_source.json", "文件地址")
-var outputSource = flag.String("o", "./model/", "文件输出位置")
+
+// 删除文件，支持模糊匹配
+func deleteFile(path string) {
+	files, err := filepath.Glob(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, file := range files {
+		os.Remove(file)
+	}
+}
 
 func main() {
 	var configs = make([]model.Config, 0)
 	getConfig(&configs)
 	pl := pluralize.NewClient()
+
 	for _, config := range configs {
+		deleteFile(config.OutputPath + "*" + "_gen.go")
+		deleteFile(config.OutputPath + "*" + "_cache.go")
 		conn := connector.NewConnector(config)
 		err := conn.Initialize()
 		if err != nil {
@@ -36,39 +51,58 @@ func main() {
 		tableNames := pa.GetTableNames()
 		tables := pa.GetTables(tableNames)
 		gen := generator.NewGenerator(config)
+		var routerData = make(map[string]string)
 		for _, table := range tables {
 			var fm = func_map.GetFuncMap(config, table, pa)
-			dbPath := *outputSource + pl.Singular(table.TableName) + "_gen.go"
+			dbPath := config.OutputPath + pl.Singular(table.TableName) + "_gen.go"
 			generateAndWrite(gen.DbTpl(), dbPath, fm, table, true)
-			repoPath := *outputSource + pl.Singular(table.TableName) + "_repo.go"
+			repoPath := config.OutputPath + pl.Singular(table.TableName) + "_repo.go"
 			generateAndWrite(gen.RepoTpl(), repoPath, fm, table, false)
+			if config.WithCache(table.TableName) {
+				cachePath := config.OutputPath + pl.Singular(table.TableName) + "_cache.go"
+				generateAndWrite(gen.CacheTpl(), cachePath, fm, table, true)
+				routerData[table.TableName] = pkg.LineToUpCamel(pl.Singular(table.TableName))
+
+				if config.CanalPath != "" {
+					canalPath := config.CanalPath + pl.Singular(table.TableName) + ".go"
+					generateAndWrite(gen.CanalTpl(), canalPath, fm, table, false)
+				}
+			}
+		}
+		if config.CanalRouterPath != "" {
+			canalRouterPath := config.CanalRouterPath + "canal.go"
+			generateAndWrite(gen.CanalRouterTpl(), canalRouterPath, nil, map[string]interface{}{
+				"tables": routerData,
+			}, true)
 		}
 	}
-
 }
 
-func generateAndWrite(tpl, path string, f template.FuncMap, table model.Table, overwrite bool) {
-	t, err := template.New("tplFile").Funcs(f).Parse(tpl)
+func generateAndWrite(tpl, path string, f template.FuncMap, data interface{}, overwrite bool) {
+	t, err := template.New(path).Funcs(f).Parse(tpl)
 	if err != nil {
 		log.Fatal(err)
 	}
 	var buf = new(bytes.Buffer)
-	err = t.ExecuteTemplate(buf, "tplFile", table)
+	err = t.ExecuteTemplate(buf, path, data)
 	if err != nil {
-		log.Fatal(table.TableName, err)
+		log.Fatal(path, err)
 	}
 	source, err := format.Source(buf.Bytes())
 	//source := buf.Bytes()
 	if err != nil {
-		log.Fatal(table.TableName, err)
+		log.Fatal(path, err)
 	}
-	if res, err1 := pkg.FileExists(*outputSource); err1 == nil && !res {
-		_ = os.Mkdir(*outputSource, 0777)
+	// path 过滤文件名，文明的格式为xx.xx
+	dirPath := path[:strings.LastIndex(path, "/")]
+
+	if res, err1 := pkg.FileExists(dirPath); err1 == nil && !res {
+		_ = os.Mkdir(dirPath, 0777)
 	}
 	if !overwrite {
 		exists, err := pkg.FileExists(path)
 		if err != nil {
-			log.Println(table.TableName, err)
+			log.Println(path, err)
 		}
 		if exists {
 			return
@@ -76,7 +110,7 @@ func generateAndWrite(tpl, path string, f template.FuncMap, table model.Table, o
 	}
 	err = os.WriteFile(path, source, 0664)
 	if err != nil {
-		log.Println(table.TableName, err)
+		log.Println(path, err)
 	}
 }
 

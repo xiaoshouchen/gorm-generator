@@ -1,56 +1,88 @@
-{{define "cache"}}
-    func (r *UserRepo) findBySlug(slug string) User {
-    var pk string
-    var user User
-    err := cache.GetOnce().Get(SlugCacheKey).String(&pk)
-    if err == nil {
-    err = cache.GetOnce().Get(fmt.Sprintf(UserCacheKey, pk)).Json(&user)
-    if err == nil {
-    return user
-    }
-    }
-    r.db.Where("slug = ?", slug).First(&user)
+package model
 
-    cache.GetOnce().Set(fmt.Sprintf(SlugCacheKey, formatInterface()), formatInterface(user.Id), 86400)
-    cache.GetOnce().Set(fmt.Sprintf(SlugCacheKey, formatInterface(user.Id)), user, 86400)
-    return user
-    }
-    func (r *UserRepo) findBySlugArr(slugArr []string) []User {
-    var keys []string
-    for _, v := range slugArr {
-    keys = append(keys, fmt.Sprintf(UserCacheKey, formatInterface(v)))
-    }
-    var pkKeys []string
-    multiRes, err2 := cache.GetOnce().MultiGet(keys)
-    if err2 == nil {
-    for _, v := range multiRes {
-    var tempKey string
-    err := v.String(&tempKey)
-    if err == nil {
-    pkKeys = append(pkKeys, tempKey)
-    }
-    }
-    }
-    if len(pkKeys) == len(slugArr) {
-    get, err := cache.GetOnce().MultiGet(pkKeys)
-    if err != nil {
-    return nil
-    }
-    }
-    var pk string
-    var user User
-    err := cache.GetOnce().Get(SlugCacheKey).String(&pk)
-    if err == nil {
-    err = cache.GetOnce().Get(fmt.Sprintf(UserCacheKey, pk)).Json(&user)
-    if err == nil {
-    return user
-    }
-    }
-    r.db.Where("slug = ?", slug).First(&user)
+import (
+	"panda-trip/pkg/custom_array"
+	"panda-trip/pkg/db"
 
-    cache.GetOnce().Set(fmt.Sprintf(SlugCacheKey, formatInterface(user.Slug)), formatInterface(user.Id), 86400)
-    cache.GetOnce().Set(fmt.Sprintf(SlugCacheKey, formatInterface(user.Id)), user, 86400)
-    return user
-    }
+	"github.com/go-mysql-org/go-mysql/canal"
+)
 
-{{-end}}
+{{ $modelName :=.TableName | singular | upCamel }}
+{{ $modelVarName :=.TableName | singular | lowCamel }}
+
+type {{$modelName}}Cache struct {
+	tool  *Tool
+	event *canal.RowsEvent
+}
+
+func New{{$modelName}}Cache(tool *Tool, event *canal.RowsEvent) *{{$modelName}}Cache {
+	return &{{$modelName}}Cache{
+		tool:  tool,
+		event: event,
+	}
+}
+
+func (s *{{$modelName}}Cache) SetEvent(event *canal.RowsEvent) {
+	s.event = event
+}
+
+func (s *{{$modelName}}Cache) Insert() error {
+	// 获取返回的数组
+	dataMap := s.tool.toMap(s.event)
+	if len(dataMap) == 0 {
+		return nil
+	}
+	// 插入
+	var {{$modelVarName}}PkArr []{{pksType}}
+	// 生成新的缓存
+	for _, data := range dataMap {
+		if id, ok := data["id"]; ok && custom_array.IsInteger(id) {
+			{{$modelVarName}}PkArr = append({{$modelVarName}}PkArr, custom_array.ToInt64(id))
+		}
+	}
+
+	// 删除旧缓存,防止空缓存的存在
+	New{{$modelName}}Repo(db.Manager).DeleteCacheBy{{pkFuncName}}Arr({{$modelVarName}}PkArr)
+	// 生成新的缓存
+	New{{$modelName}}Repo(db.Manager).FindBy{{pkFuncName}}Arr({{$modelVarName}}PkArr)
+	return nil
+}
+
+func (s *{{$modelName}}Cache) Update() error {
+	// 获取返回的数组
+	dataMap := s.tool.toMap(s.event)
+	if len(dataMap) == 0 {
+		return nil
+	}
+	// 更新
+	var {{$modelVarName}}PkArr []{{pksType}}
+	
+	for _, data := range dataMap {
+		if id, ok := data["id"]; ok && custom_array.IsInteger(id) {
+			{{$modelVarName}}PkArr = append({{$modelVarName}}PkArr, custom_array.ToInt64(id))
+		}
+	}
+	// 删除旧缓存
+	New{{$modelName}}Repo(db.Manager).DeleteCacheBy{{pkFuncName}}Arr({{$modelVarName}}PkArr)
+	// 生成新的缓存
+	New{{$modelName}}Repo(db.Manager).FindBy{{pkFuncName}}Arr({{$modelVarName}}PkArr)
+	return nil
+}
+
+func (s *{{$modelName}}Cache) Delete() error {
+	// 获取返回的数组
+	dataMap := s.tool.toMap(s.event)
+	if len(dataMap) == 0 {
+		return nil
+	}
+	// 删除
+	var {{$modelVarName}}PkArr []{{pksType}}
+	// 删除缓存
+	for _, data := range dataMap {
+		if id, ok := data["id"]; ok && custom_array.IsInteger(id) {
+			{{$modelVarName}}PkArr = append({{$modelVarName}}PkArr, custom_array.ToInt64(id))
+		}
+	}
+	New{{$modelName}}Repo(db.Manager).DeleteCacheBy{{pkFuncName}}Arr({{$modelVarName}}PkArr)
+	return nil
+}

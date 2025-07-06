@@ -18,6 +18,9 @@ type Config struct {
 		Name string `json:"name"`
 		Time int    `json:"time"`
 	} `json:"cache_expiration"`
+	CanalPath       string `json:"canal_path"`
+	CanalRouterPath string `json:"canal_router_path"`
+	OutputPath      string `json:"output_path"`
 }
 
 // WithCache 是否开启缓存
