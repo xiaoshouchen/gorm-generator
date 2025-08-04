@@ -5,7 +5,11 @@
         var count int64
         db := r.db.Model(&{{$modelName}}{})
         for _, w := range where {
-            db = db.Where(w.Key+" "+w.Value.Op+" ?", w.Value.Arg)
+            if w.Value.IsSubQuery {
+			db = db.Where(w.Key+" "+w.Value.Op+" (?)", w.Value.Arg)
+            } else {
+                db = db.Where(w.Key+" "+w.Value.Op+" ?", w.Value.Arg)
+            }
         }
         res := db.Count(&count)
         return count, res.Error

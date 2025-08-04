@@ -11,24 +11,24 @@ import (
 {{ $modelVarName :=.TableName | singular | lowCamel }}
 
 type {{$modelName}}Cache struct {
-	tool  *Tool
-	event *canal.RowsEvent
+	Tool  *Tool
+	Event *canal.RowsEvent
 }
 
 func New{{$modelName}}Cache(tool *Tool, event *canal.RowsEvent) *{{$modelName}}Cache {
 	return &{{$modelName}}Cache{
-		tool:  tool,
-		event: event,
+		Tool:  tool,
+		Event: event,
 	}
 }
 
 func (s *{{$modelName}}Cache) SetEvent(event *canal.RowsEvent) {
-	s.event = event
+	s.Event = event
 }
 
 func (s *{{$modelName}}Cache) Insert() error {
 	// 获取返回的数组
-	dataMap := s.tool.toMap(s.event)
+	dataMap := s.Tool.ToMap(s.Event)
 	if len(dataMap) == 0 {
 		return nil
 	}
@@ -50,7 +50,7 @@ func (s *{{$modelName}}Cache) Insert() error {
 
 func (s *{{$modelName}}Cache) Update() error {
 	// 获取返回的数组
-	dataMap := s.tool.toMap(s.event)
+	dataMap := s.Tool.ToMap(s.Event)
 	if len(dataMap) == 0 {
 		return nil
 	}
@@ -71,7 +71,7 @@ func (s *{{$modelName}}Cache) Update() error {
 
 func (s *{{$modelName}}Cache) Delete() error {
 	// 获取返回的数组
-	dataMap := s.tool.toMap(s.event)
+	dataMap := s.Tool.ToMap(s.Event)
 	if len(dataMap) == 0 {
 		return nil
 	}

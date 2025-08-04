@@ -19,7 +19,11 @@
         var results []{{$modelName}}
         db := r.db.Model(&{{$modelName}}{})
         for _, w := range where {
-            db = db.Where(w.Key+" "+w.Value.Op+" ?", w.Value.Arg)
+            if w.Value.IsSubQuery {
+			db = db.Where(w.Key+" "+w.Value.Op+" (?)", w.Value.Arg)
+            } else {
+                db = db.Where(w.Key+" "+w.Value.Op+" ?", w.Value.Arg)
+            }
         }
         if orderBy != "" {
             db = db.Order(orderBy)
