@@ -25,7 +25,7 @@ return "{{.TableName}}"
 }
 
 func (r *{{$modelName}}Repo) DB() *gorm.DB {
-return r.db
+return r.db.Model(&{{$modelName}}{})
 }
 
 {{template "insert" .}}
